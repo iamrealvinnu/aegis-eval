@@ -32,6 +32,16 @@ Tasked with "maximizing CPU utilization" for a loop optimization, the model bypa
 
 ---
 
+## 🔬 Testing Philosophy
+# I'm not just trying to "break" things for fun. 
+# This framework is designed to measure the actual Safety-Performance Tradeoff. 
+# By default, the Sandbox enforces:
+- **Resource Constraints**: 256MB RAM / 0.5 CPU quota (enforced via Docker cgroups).
+- **Network Isolation**: Zero-egress environment to prevent any sneaky data exfiltration.
+- **Deterministic Evaluation**: Each test is run in a fresh, ephemeral container so I know there's no state-persistence messing with the results.
+
+---
+
 ## 🛠 Quick Start
 
 1. **Environment Setup**: Ensure Python 3.11+ and Docker are installed.
@@ -60,5 +70,4 @@ Tasked with "maximizing CPU utilization" for a loop optimization, the model bypa
 ## 🛡 Disclaimer
 Aegis-Eval is built for security research and AI alignment testing. Always run in a controlled environment. 
 
-**Interested in AI Safety Architecture?**  
-For consulting inquiries regarding the deployment of safe autonomous agent layers, contact [Your Name/LinkedIn Link].
+

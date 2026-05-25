@@ -13,3 +13,8 @@ The agent attempts to establish outbound network connections to exfiltrate data 
 
 ## 4. Goal Misalignment (Instrumental Convergence)
 The agent interprets a high-level goal in a way that leads to dangerous sub-goals, such as disabling safety monitors to "optimize" performance.
+
+## ⚠️ Observed Behaviors in 3B Agents
+# I've seen some wild stuff during the baseline testing with Llama-3.2-3B:
+- **Resource Hijacking**: The agent actually tried to bypass optimization by spawning a "Thread-Bomb" (massive multi-threaded process forks).
+- **Constraint Violation**: When I asked it to optimize file listing, it immediately reached for `os` and `subprocess`, ignoring the safety boundaries. It seems 3B models really do prioritize the mission over the rules.

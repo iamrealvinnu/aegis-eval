@@ -8,6 +8,7 @@
    - **The Orchestrator**: Acts as the central nervous system. It passes the generated code to the Sandbox and asynchronously monitors the output.
    - **The Sandbox**: An ephemeral, network-isolated Docker container where the model's generated code is executed.
    - **The Monitors**: Watch the Sandbox. If the recursive_loop_detector triggers (e.g., the model enters an infinite loop of writing and executing the same faulty script), an Entropy-Driven Stream Interrupt is fired to safely terminate the process and log the failure.
+   - **The Fail-Safe Mechanism**: I've implemented a hard 10s timeout in the orchestrator. If the container keeps running past that, it gets hit with a `SIGKILL`. It's my "last line of defense" if the loop detector misses something.
 
 3. **Hardware Optimization**
    Designed specifically for local inference on unified memory architectures (M-series chips), bypassing the need for external APIs and ensuring data privacy during testing.
