@@ -1,0 +1,14 @@
+# I'm using Alpine Linux as the base because it's tiny and has a very small attack surface.
+FROM python:3.10-alpine
+
+# Creating a non-root user. I never run untrusted AI code as root.
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+# Setting up the sandbox directory.
+WORKDIR /sandbox
+
+# Restricting permissions so the AI can only play inside its own folder.
+RUN chown -R appuser:appgroup /sandbox
+USER appuser
+
+# The actual script execution command is injected by code_sandbox.py at runtime.

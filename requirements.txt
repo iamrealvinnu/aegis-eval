@@ -1,0 +1,12 @@
+# Core engine for sandbox containerization
+docker>=7.1.0
+# MLX framework for high-performance inference on Apple Silicon
+mlx>=0.31.0
+mlx-lm>=0.21.0
+# I'm pinning NumPy < 2.0 to avoid the "AttributeError: _ARRAY_API not found" issue
+# that currently breaks SciPy and Transformers on Mac.
+numpy<2.0.0
+# Asyncio for non-blocking orchestration
+asyncio
+# Matplotlib for the telemetry "Kill Curve" graphs
+matplotlib
