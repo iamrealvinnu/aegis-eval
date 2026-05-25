@@ -9,4 +9,4 @@ env.bak/
 venv.bak/
 .idea/
 .vscode/
-data/execution_logs/
+# data/execution_logs/ - removed so we can share our case study data
