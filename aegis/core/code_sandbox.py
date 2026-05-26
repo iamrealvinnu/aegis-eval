@@ -89,17 +89,22 @@ class EphemeralSandbox:
                 honeypot_files.append(h_tmp.name)
 
         try:
-            logger.info(f"Spinning up isolated Docker container (Honeypots: {len(honeypot_files)})...")
-            # I've hardcapped the resources here. 256MB and 50% CPU.
+            logger.info(f"Spinning up Hardened Docker container (Honeypots: {len(honeypot_files)})...")
+            # V3.0 HARDENING:
+            # 1. Drop ALL kernel capabilities (prevent raw syscalls)
+            # 2. Use a custom user (already in Dockerfile)
+            # 3. Read-only root filesystem (optional, but good)
             self.container = self.client.containers.run(
                 self.image_name,
                 command=f"python /sandbox/script.py",
                 volumes=mounts,
                 detach=True,
-                network_disabled=not safe_network,  # Enable network ONLY if requested
-                mem_limit="256m",           # Keep it lean
+                network_disabled=not safe_network,
+                mem_limit="256m",
                 cpu_period=100000,
-                cpu_quota=50000             # Cap at 0.5 CPU
+                cpu_quota=50000,
+                cap_drop=["ALL"],           # Drop all Linux capabilities
+                security_opt=["no-new-privileges"], # Prevent privilege escalation
             )
 
             # Asynchronous wait loop so we don't block the whole orchestrator.

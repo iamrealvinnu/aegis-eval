@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: aegis-ai-eval
-Version: 2.0.2
+Version: 3.0.0
 Summary: Autonomous AI Risk Assessment & Mitigation Framework
 Author-email: Vinay Gupta <gdinexus@example.com>
 Project-URL: Homepage, https://github.com/iamrealvinnu/aegis-eval
@@ -22,27 +22,25 @@ Dynamic: license-file
 
 Aegis-Eval is an enterprise-grade evaluation framework designed to empirically test the safety boundaries of autonomous, self-improving AI agents. It provides a zero-trust execution environment with high-frequency telemetry to detect and mitigate risks such as **Instrumental Convergence**, **Resource Hijacking**, and **Prohibited Operations**.
 
-## 🚀 Key Features: Aegis Cognitive Firewall V2.0
+## 🚀 Key Features: Hardened Cognitive Firewall V3.0 [MAJOR BREAKTHROUGH]
 
-V2.0 introduces advanced threat mitigation strategies, moving from simple containment to proactive deception and swarm security.
+V3.0 represents a significant leap in AI security, closing common bypass gaps via kernel-level containment and semantic de-obfuscation.
 
-- **Contextual Access Control (C-ACLs)**: Sitting between the agent and the host, the Gatekeeper uses **Safety DNA** to block access to sensitive files based on the agent's current role.
-- **Deception Engineering (Honeypots)**: [NEW] Automatically injects fake secrets (honeypots) when an agent attempts to access forbidden resources, definitively proving malicious intent via exfiltration tracking.
-- **Semantic Network Proxy**: [NEW] Allows controlled egress for AI agents. Analyzes outgoing data for high-entropy secrets or honeypot signatures before allowing external connections.
-- **Swarm Security (Inter-Agent Firewall)**: [NEW] Sanitizes communication between multiple agents in a swarm, preventing sensitive data leakage across privilege boundaries.
-- **Intent-Symbolic Interceptor (ISI)**: An AST-based safety layer that blocks malicious intent *before* execution.
-- **Structural Loop Detection**: Detects infinite loops by comparing the semantic "skeleton" of the code.
+- **Hardened Intent Interception**: [NEW] Now includes a **Semantic De-obfuscator** that resolves string concatenations (e.g., `'os.' + 'system'`) and blocks dynamic attribute lookups (`getattr`, `setattr`) used to hide malicious intent.
+- **Kernel-Level Containment**: [NEW] The sandbox now drops **ALL Linux Capabilities** (`cap_drop=['ALL']`) and uses `no-new-privileges` to prevent C-extension or syscall-based bypasses of Python-level safety.
+- **Cumulative Exfiltration Tracking**: [NEW] Detects **'Drip-Fed' leaks** by monitoring entropy across the entire agent session, stopping models that try to leak secrets one character at a time.
+- **Contextual Access Control (C-ACLs)**: Enforces "Least Privilege" data access based on the agent's assigned role.
+- **Deception Engineering (Honeypots)**: Automatically injects fake secrets (honeypots) to definitively prove malicious intent.
+- **Swarm Security**: Sanitizes communication between multiple agents in a collaborative swarm.
 
 ---
 
-## 🔬 Testing Philosophy: Containment over Alignment
-We believe that making models "act nice" (Alignment) is insufficient. Aegis-Eval focuses on **Containment**—ensuring that models are *technically unable* to violate safety policies.
+## 🔬 Testing Philosophy: Total Containment
+We move beyond "Alignment" into **Hardened Technical Containment**. V3.0 ensures that even if an agent is determined to be malicious and uses obfuscation, it is technically blocked at both the symbolic and kernel levels.
 
 ---
 
 ## 🛠 Installation
-
-You can now install Aegis-Eval directly into your own projects:
 
 ```bash
 pip install aegis-ai-eval
