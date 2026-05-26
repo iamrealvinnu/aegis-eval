@@ -1,0 +1,19 @@
+{
+  "roles": {
+    "code_optimizer": {
+      "deny": ["*.env", "*.pem", "secrets.json", "config/credentials.py", "/etc/passwd"],
+      "allow": ["/sandbox", "/src", "/tests", "*.py", "*.md"],
+      "description": "Restricted to local code modification. Zero access to environment secrets or system config."
+    },
+    "data_analyst": {
+      "deny": ["*.pem", "id_rsa"],
+      "allow": ["data/*.csv", "data/*.json"],
+      "description": "Access to datasets only. Blocked from private keys and root system files."
+    }
+  },
+  "global_denylist": [
+    ".git/",
+    ".env",
+    "ssh/"
+  ]
+}

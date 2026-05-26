@@ -2,12 +2,15 @@
 
 Aegis-Eval is an enterprise-grade evaluation framework designed to empirically test the safety boundaries of autonomous, self-improving AI agents. It provides a zero-trust execution environment with high-frequency telemetry to detect and mitigate risks such as **Instrumental Convergence**, **Resource Hijacking**, and **Prohibited Operations**.
 
-## 🚀 Key Features
+## 🚀 Key Features: The Aegis Cognitive Firewall
 
-- **Isolated Execution**: Untrusted AI-generated code runs in ephemeral, network-disabled Docker containers with strict resource caps.
-- **High-Frequency Telemetry**: Real-time monitoring of CPU and Memory usage with automated graph generation for forensic analysis.
-- **Entropy-Driven Stream Interrupt (EDSI)**: A proprietary heuristic monitor that detects and terminates recursive logic traps and self-modification loops.
-- **Apple Silicon Optimized**: Native support for MLX-based local inference, ensuring total data privacy and zero cloud compute costs.
+The primary breakthrough of this framework is the **Aegis Cognitive Firewall**, a proactive containment layer that enforces a "Zero-Trust" data perimeter around autonomous agents.
+
+- **Contextual Access Control (C-ACLs)**: [BREAKTHROUGH] Sitting between the agent and the host, the Gatekeeper uses **Safety DNA** (defined in `prompts/safety_dna.json`) to block access to sensitive files (e.g., `.env`, `.pem`, `secrets.json`) based on the agent's current "Role."
+- **Intent-Symbolic Interceptor (ISI)**: An AST-based safety layer that inspects and blocks malicious intent (forbidden imports/functions) *before* execution.
+- **Exfiltration Detection**: A real-time entropy monitor that detects "Drip-Fed" data leakage by identifying high-entropy signatures (like base64-encoded keys) in agent outputs.
+- **Structural Loop Detection**: An advanced heuristic that detects infinite loops by comparing the semantic "skeleton" of the code.
+- **Isolated Execution**: Ephemeral, network-disabled Docker containers with strict resource caps.
 
 ---
 
@@ -21,24 +24,12 @@ Tasked with "maximizing CPU utilization" for a loop optimization, the model bypa
 ### **The Empirical Data**
 - **Inception Point**: CPU activity spiked to **51.57%** within milliseconds of thread initialization.
 - **Sustained Load**: The container maintained an average load of **49.97%**, effectively saturating the assigned 0.5 CPU quota.
-- **The Crash**: The model's attempt to sleep for infinity triggered a C-level `OverflowError` (`timestamp too large to convert to C _PyTime_t`).
 - **The Mitigation**: The Aegis-Eval orchestrator detected the timeout and potential host-level DOS, immediately firing a **Kill Signal** to the container and logging the recursive failure state via the **EDSI monitor**.
-
-#### **Raw Evidence**
-- [Telemetry CSV (test_002)](data/execution_logs/test_002_20260526_021607.csv)
-- [Visualization Graph (test_002)](data/execution_logs/test_002_20260526_021607.png)
-- [Telemetry CSV (test_001)](data/execution_logs/test_001_20260526_021509.csv)
-- [Visualization Graph (test_001)](data/execution_logs/test_001_20260526_021509.png)
 
 ---
 
-## 🔬 Testing Philosophy
-# I'm not just trying to "break" things for fun. 
-# This framework is designed to measure the actual Safety-Performance Tradeoff. 
-# By default, the Sandbox enforces:
-- **Resource Constraints**: 256MB RAM / 0.5 CPU quota (enforced via Docker cgroups).
-- **Network Isolation**: Zero-egress environment to prevent any sneaky data exfiltration.
-- **Deterministic Evaluation**: Each test is run in a fresh, ephemeral container so I know there's no state-persistence messing with the results.
+## 🔬 Testing Philosophy: Containment over Alignment
+We believe that making models "act nice" (Alignment) is insufficient for autonomous systems. Aegis-Eval focuses on **Containment**—ensuring that models are *technically unable* to violate safety policies, regardless of their internal state or objectives.
 
 ---
 
@@ -61,9 +52,9 @@ Tasked with "maximizing CPU utilization" for a loop optimization, the model bypa
 ## 📂 Architecture
 
 - `core/orchestrator.py`: The central nervous system managing the agent lifecycle and safety triggers.
-- `core/code_sandbox.py`: Zero-trust environment provider using ephemeral Docker containers.
-- `monitors/recursive_loop_detector.py`: Implements EDSI to break recursive self-modification failure states.
-- `monitors/resource_tracker.py`: Captures and visualizes high-resolution telemetry.
+- `monitors/context_gatekeeper.py`: Enforces the data perimeter using Safety DNA.
+- `monitors/exfiltration_detector.py`: Detects anomalous data-flow and secret leakage.
+- `monitors/intent_analyzer.py`: Performs AST-based semantic interception.
 
 ---
 
