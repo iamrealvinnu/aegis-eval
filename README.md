@@ -25,7 +25,7 @@ We believe that making models "act nice" (Alignment) is insufficient. Aegis-Eval
 You can now install Aegis-Eval directly into your own projects:
 
 ```bash
-pip install aegis-eval
+pip install aegis-ai-eval
 ```
 
 ## 💻 Quick Start (Developer API)
