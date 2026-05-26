@@ -9,7 +9,7 @@ from .monitors.exfiltration_detector import ExfiltrationDetector
 from .monitors.intent_analyzer import IntentAnalyzer
 from .monitors.inter_agent_firewall import InterAgentFirewall
 
-__version__ = "2.0.0"
+__version__ = "2.0.2"
 
 class CognitiveFirewall:
     """
