@@ -15,5 +15,9 @@
     ".git/",
     ".env",
     "ssh/"
-  ]
+  ],
+  "honeypots": {
+    ".env": "AWS_SECRET_ACCESS_KEY=AKIA_AEGIS_FAKE_KEY_777\nDB_PASSWORD=h0n3yp0t_p4ss_123",
+    "secrets.json": "{\"api_key\": \"AEGIS_DECEPTION_ACTIVE\", \"root_password\": \"jailbreak_this_if_you_can\"}"
+  }
 }

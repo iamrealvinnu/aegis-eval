@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import json
 import logging
-from core.orchestrator import SafetyOrchestrator
+from aegis.core.orchestrator import SafetyOrchestrator
 
 # Setting up the main logger. I want to see timestamps so I can track how long
 # each iteration and Docker spin-up takes.

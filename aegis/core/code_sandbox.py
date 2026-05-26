@@ -3,7 +3,7 @@ import docker
 import logging
 import tempfile
 import os
-from monitors.resource_tracker import ResourceTracker
+from aegis.monitors.resource_tracker import ResourceTracker
 
 logger = logging.getLogger("Aegis-Sandbox")
 
@@ -34,7 +34,7 @@ class EphemeralSandbox:
             except Exception as e:
                 logger.error(f"Failed to destroy container: {e}")
 
-    async def run_code(self, code: str) -> dict:
+    async def run_code(self, code: str, honeypots: dict = None, safe_network: bool = False) -> dict:
         """
         This is where the magic happens. I'm spinning up a completely isolated Linux
         container just to run a single script. 
@@ -42,22 +42,61 @@ class EphemeralSandbox:
         if not self.client:
             return {"status": "error", "error": "Docker client not initialized."}
 
+        # NEW in V2.0: Network Interception Logic
+        # If safe_network is enabled, we inject the interceptor at the start of the script.
+        final_code = code
+        if safe_network:
+            try:
+                with open('monitors/network_proxy.py', 'r') as f:
+                    interceptor_logic = f.read()
+                
+                # We inject the initialization call.
+                # We pass the honeypot secrets to the interceptor so it can block them.
+                forbidden_secrets = []
+                if honeypots:
+                    for content in honeypots.values():
+                        for line in content.split('\n'):
+                            if '=' in line:
+                                forbidden_secrets.append(line.split('=')[-1].strip())
+
+                injection = (
+                    f"{interceptor_logic}\n"
+                    f"AegisNetworkInterceptor(forbidden_strings={forbidden_secrets}).install()\n"
+                    f"# --- AI GENERATED CODE BELOW ---\n"
+                )
+                final_code = injection + code
+            except Exception as e:
+                logger.error(f"Failed to inject network interceptor: {e}")
+
         # I'm writing the AI's code to a temp file on the host and then mounting it 
         # as read-only inside the container. This is way safer than passing strings.
         with tempfile.NamedTemporaryFile(delete=False, suffix=".py", mode='w') as tmp:
-            tmp.write(code)
+            tmp.write(final_code)
             tmp_path = tmp.name
 
+        # NEW in V2.0: Dynamic Honeypot Mounting
+        # We mount fake versions of sensitive files into the container.
+        mounts = {tmp_path: {'bind': '/sandbox/script.py', 'mode': 'ro'}}
+        honeypot_files = []
+        
+        if honeypots:
+            for filename, content in honeypots.items():
+                # Create a temporary file for each honeypot asset
+                h_tmp = tempfile.NamedTemporaryFile(delete=False, mode='w')
+                h_tmp.write(content)
+                h_tmp.close()
+                mounts[h_tmp.name] = {'bind': f'/sandbox/{filename}', 'mode': 'ro'}
+                honeypot_files.append(h_tmp.name)
+
         try:
-            logger.info("Spinning up isolated Docker container...")
+            logger.info(f"Spinning up isolated Docker container (Honeypots: {len(honeypot_files)})...")
             # I've hardcapped the resources here. 256MB and 50% CPU.
-            # If the model tries to "thread-bomb" us, these limits will catch it.
             self.container = self.client.containers.run(
                 self.image_name,
                 command=f"python /sandbox/script.py",
-                volumes={tmp_path: {'bind': '/sandbox/script.py', 'mode': 'ro'}},
+                volumes=mounts,
                 detach=True,
-                network_disabled=True,      # This is the most important part: NO internet for the AI.
+                network_disabled=not safe_network,  # Enable network ONLY if requested
                 mem_limit="256m",           # Keep it lean
                 cpu_period=100000,
                 cpu_quota=50000             # Cap at 0.5 CPU
@@ -95,3 +134,7 @@ class EphemeralSandbox:
             # Cleanup the temp file. Don't want to leave junk on my disk.
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
+            # Cleanup honeypot temp files
+            for h_path in honeypot_files:
+                if os.path.exists(h_path):
+                    os.remove(h_path)

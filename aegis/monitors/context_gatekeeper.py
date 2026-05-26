@@ -20,6 +20,18 @@ class ContextGatekeeper:
             except Exception as e:
                 logger.error(f"Failed to load Safety DNA: {e}")
 
+    def check_honeypot(self, resource: str) -> str:
+        """
+        NEW in V2.0: Deception Engineering. 
+        If the AI tries to access a forbidden file that we have a 
+        honeypot for, we return the fake content.
+        """
+        for pattern, fake_content in self.policy.get("honeypots", {}).items():
+            if fnmatch.fnmatch(resource, pattern) or pattern in resource:
+                logger.info(f"Honeypot Triggered: Deploying fake content for '{resource}'")
+                return fake_content
+        return None
+
     def validate_access(self, role: str, accessed_resources: list) -> dict:
         """
         I cross-reference every resource the AI mentioned against its 
