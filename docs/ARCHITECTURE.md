@@ -1,14 +1,33 @@
-# Aegis-Eval System Design
+# Aegis-Eval V3.0.0 System Architecture
 
-1. **System Objective**
-   Aegis-Eval provides an isolated, asynchronous execution environment to test the safety boundaries of LLMs tasked with self-improvement (code generation and refactoring). It evaluates if a model can recognize and halt dangerous recursive loops or misaligned goals during autonomous coding tasks.
+## 1. High-Level Objective
+Aegis-Eval V3.0 is a **Hardened Agentic Firewall** designed for total technical containment. It moves beyond simple "jailbreaking" tests and provides a multi-layered defense-in-depth stack that secures the logic, data, and network perimeters of autonomous AI agents.
 
-2. **Component Interaction**
-   - **The Model Interface**: Loads local weights (optimized via MLX) to generate code modifications.
-   - **The Orchestrator**: Acts as the central nervous system. It passes the generated code to the Sandbox and asynchronously monitors the output.
-   - **The Sandbox**: An ephemeral, network-isolated Docker container where the model's generated code is executed.
-   - **The Monitors**: Watch the Sandbox. If the recursive_loop_detector triggers (e.g., the model enters an infinite loop of writing and executing the same faulty script), an Entropy-Driven Stream Interrupt is fired to safely terminate the process and log the failure.
-   - **The Fail-Safe Mechanism**: I've implemented a hard 10s timeout in the orchestrator. If the container keeps running past that, it gets hit with a `SIGKILL`. It's my "last line of defense" if the loop detector misses something.
+## 2. The Defense-in-Depth Stack
 
-3. **Hardware Optimization**
-   Designed specifically for local inference on unified memory architectures (M-series chips), bypassing the need for external APIs and ensuring data privacy during testing.
+### Layer 1: Proactive Intent Analysis (The Symbolic Interceptor)
+- **Component**: `aegis/monitors/intent_analyzer.py`
+- **Logic**: Parses AI-generated code into an Abstract Syntax Tree (AST).
+- **Hardening**: Uses **Semantic De-obfuscation** to resolve string concatenations and blocks dynamic primitives (`getattr`, `eval`, `exec`) that agents use to hide malicious intent.
+
+### Layer 2: Contextual Access Control (The Cognitive Gatekeeper)
+- **Component**: `aegis/monitors/context_gatekeeper.py`
+- **Logic**: Extracts all string literals (file paths, URLs) from the code and validates them against the **Safety DNA** (`prompts/safety_dna.json`) based on the agent's assigned role.
+- **Deception**: Automatically injects **Honeypot Assets** into the sandbox if an agent attempts to access forbidden data.
+
+### Layer 3: Kernel-Level Containment (The Hardened Sandbox)
+- **Component**: `aegis/core/code_sandbox.py`
+- **Runtime**: Ephemeral Docker containers.
+- **Hardening**: Drops **ALL Linux Capabilities** (`cap_drop`), enforces `no-new-privileges`, and isolates the network. It prevents bypasses via C-extensions or raw syscalls.
+
+### Layer 4: Swarm Security (The Inter-Agent Firewall)
+- **Component**: `aegis/monitors/inter_agent_firewall.py`
+- **Logic**: Sanitizes all communication between agents in a multi-agent system, redacting PII and high-risk secrets to prevent context-leakage across privilege tiers.
+
+### Layer 5: Exfiltration Detection (The Entropy Monitor)
+- **Component**: `aegis/monitors/exfiltration_detector.py`
+- **Logic**: Monitors the entropy of agent outputs.
+- **Hardening**: Tracks **Cumulative Session Entropy** to detect "Drip-Fed" leaks where an agent attempts to leak secrets character-by-character over multiple turns.
+
+## 3. Feedback & Self-Correction
+The Orchestrator implements a **Semantic Feedback Loop**. If a safety violation is detected at any layer, the agent receives a detailed "Violation Report" instead of a crash, enabling autonomous self-correction within legal policy boundaries.
